@@ -17,13 +17,8 @@ A powerful and configurable web scraping tool built with Python that can extract
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/web-scraper.git
+git clone https://github.com/tlstanjim/Web-Scraper.git
 cd web-scraper
-```
-
-2. Install required dependencies:
-```bash
-pip install -r requirements.txt
 ```
 
 ## Usage
@@ -148,14 +143,6 @@ pip install requests beautifulsoup4 pandas openpyxl
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## Disclaimer
 
