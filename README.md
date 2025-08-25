@@ -1,4 +1,4 @@
-# Web Scraper Project
+# Web Scraper
 
 A powerful and configurable web scraping tool built with Python that can extract data from websites with pagination support, data cleaning, and multiple export formats.
 
