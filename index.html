@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper with Clean CSV Output</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #4ecdc4;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #c9d6df;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #4ecdc4;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 1rem;
+        }
+        
+        button {
+            background: #4ecdc4;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        button:hover {
+            background: #3bb4ac;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .results {
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #4ecdc4;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background: rgba(242, 242, 242, 0.8);
+        }
+        
+        tr:hover {
+            background: rgba(78, 205, 196, 0.2);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-download {
+            background: #ff6b6b;
+        }
+        
+        .btn-download:hover {
+            background: #ee5a5a;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+        
+        .status.visible {
+            display: block;
+        }
+        
+        .progress {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #4ecdc4;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #c9d6df;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .card {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Web Scraper with Clean CSV Output</h1>
+            <p class="subtitle">Extract data from websites and generate well-formatted CSV files</p>
+        </header>
+        
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-cogs"></i> Configuration
+            </h2>
+            <div class="form-group">
+                <label for="url">Website URL</label>
+                <input type="url" id="url" placeholder="https://example.com" value="https://httpbin.org/json">
+            </div>
+            
+            <div class="form-group">
+                <label for="data-structure">Data Structure (JSON)</label>
+                <textarea id="data-structure" rows="6">{
+  "slideshow": {
+    "author": "Yours Truly",
+    "date": "date of publication",
+    "slides": [
+      {
+        "title": "Wake up to WonderWidgets!",
+        "type": "all"
+      },
+      {
+        "items": [
+          "Why <em>WonderWidgets</em> are great",
+          "Who <em>buys</em> WonderWidgets"
+        ],
+        "title": "Overview",
+        "type": "all"
+      }
+    ],
+    "title": "Sample Slide Show"
+  }
+}</textarea>
+            </div>
+            
+            <button id="scrape-btn">
+                <i class="fas fa-download"></i> Scrape Data
+            </button>
+        </div>
+        
+        <div class="status" id="status">
+            <p>Scraping data from <span id="status-url">https://example.com</span></p>
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+        
+        <div class="card" id="results-card" style="display: none;">
+            <h2 class="card-title">
+                <i class="fas fa-table"></i> Results
+            </h2>
+            
+            <div class="results">
+                <table id="results-table">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Results will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="actions">
+                <button id="download-csv" class="btn-download">
+                    <i class="fas fa-file-csv"></i> Download CSV
+                </button>
+                <button id="copy-clipboard">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <label for="csv-preview">CSV Preview</label>
+                <textarea id="csv-preview" rows="6" readonly></textarea>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>This is a demonstration of a web scraper with clean CSV output. For educational purposes only.</p>
+            <p>Always respect website terms of service and robots.txt when scraping.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const scrapeBtn = document.getElementById('scrape-btn');
+            const statusEl = document.getElementById('status');
+            const progressBar = document.getElementById('progress-bar');
+            const resultsCard = document.getElementById('results-card');
+            const resultsTable = document.getElementById('results-table');
+            const downloadCsvBtn = document.getElementById('download-csv');
+            const copyClipboardBtn = document.getElementById('copy-clipboard');
+            const csvPreview = document.getElementById('csv-preview');
+            const statusUrl = document.getElementById('status-url');
+            
+            // Sample data for demonstration
+            const sampleData = [
+                { id: 1, name: 'Product A', price: '$19.99', category: 'Electronics', rating: 4.5 },
+                { id: 2, name: 'Product B', price: '$29.99', category: 'Books', rating: 4.2 },
+                { id: 3, name: 'Product C', price: '$9.99', category: 'Home', rating: 3.8 },
+                { id: 4, name: 'Product D', price: '$49.99', category: 'Electronics', rating: 4.7 },
+                { id: 5, name: 'Product E', price: '$14.99', category: 'Clothing', rating: 4.0 }
+            ];
+            
+            // Function to format CSV properly
+            function formatCSV(data) {
+                if (!data || data.length === 0) return '';
+                
+                // Get headers
+                const headers = Object.keys(data[0]);
+                
+                // Create CSV content
+                let csvContent = '';
+                
+                // Add headers
+                csvContent += headers.map(header => `"${header}"`).join(',') + '\r\n';
+                
+                // Add rows
+                data.forEach(row => {
+                    const values = headers.map(header => {
+                        // Escape quotes and wrap in quotes
+                        const value = row[header] !== undefined ? row[header].toString() : '';
+                        return `"${value.replace(/"/g, '""')}"`;
+                    });
+                    csvContent += values.join(',') + '\r\n';
+                });
+                
+                return csvContent;
+            }
+            
+            // Function to download CSV
+            function downloadCSV(csvContent, filename) {
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // Function to simulate scraping
+            function simulateScraping() {
+                statusUrl.textContent = document.getElementById('url').value;
+                statusEl.classList.add('visible');
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        displayResults(sampleData);
+                    }
+                }, 100);
+            }
+            
+            // Function to display results
+            function displayResults(data) {
+                // Clear previous results
+                const tbody = resultsTable.querySelector('tbody');
+                tbody.innerHTML = '';
+                
+                // Add data to table
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    
+                    Object.values(row).forEach(value => {
+                        const td = document.createElement('td');
+                        td.textContent = value;
+                        tr.appendChild(td);
+                    });
+                    
+                    tbody.appendChild(tr);
+                });
+                
+                // Generate and show CSV
+                const csvContent = formatCSV(data);
+                csvPreview.value = csvContent;
+                
+                // Show results card
+                resultsCard.style.display = 'block';
+                
+                // Scroll to results
+                resultsCard.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // Event listeners
+            scrapeBtn.addEventListener('click', simulateScraping);
+            
+            downloadCsvBtn.addEventListener('click', function() {
+                const csvContent = csvPreview.value;
+                if (csvContent) {
+                    downloadCSV(csvContent, 'web-scraper-data.csv');
+                }
+            });
+            
+            copyClipboardBtn.addEventListener('click', function() {
+                csvPreview.select();
+                document.execCommand('copy');
+                
+                // Visual feedback
+                const originalText = copyClipboardBtn.innerHTML;
+                copyClipboardBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                
+                setTimeout(() => {
+                    copyClipboardBtn.innerHTML = originalText;
+                }, 2000);
+            });
+            
+            // Initialize with sample data CSV preview
+            csvPreview.value = formatCSV(sampleData);
+        });
+    </script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</body>
+</html>
